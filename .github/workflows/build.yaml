@@ -8,7 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        container: ["go-templ-tailwindcss"]
+        container:
+          - "buildah"
+          - "go-templ-tailwindcss"
     steps:
       - uses: actions/checkout@v4
       - name: Buildah Base Images
