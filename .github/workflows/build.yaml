@@ -1,0 +1,31 @@
+name: build
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-base:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        container: ["go-templ-tailwindcss"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Buildah Base Images
+        id: build-base
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: builder
+          tags: ${{ matrix.container }}
+          oci: true
+          containerfiles: |
+            Dockerfile.${{ matrix.container }}
+      - name: Push Base To ghcr
+        id: push-base-to-docker
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-base.outputs.image }}
+          tags: ${{ steps.build-base.outputs.tags }}
+          registry: "ghcr.io/wp-ci"
+          username: "naicoi92"
+          password: ${{ secrets.GH_TOKEN }}
